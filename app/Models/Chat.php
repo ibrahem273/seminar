@@ -12,7 +12,7 @@ class Chat extends Model
     use HasFactory;
 
     protected $table = 'chats';
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     function participants(): HasMany
     {

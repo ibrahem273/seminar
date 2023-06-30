@@ -28,7 +28,7 @@ class chatController extends Controller
      * Display a listing of the resource.
      */
     public function index(GetchatRequest $request)
-    {return auth()->user()->id;
+    {
         $data = $request->validated();
         $isPrivate = 1;
         if ($request->has('is_private')) {

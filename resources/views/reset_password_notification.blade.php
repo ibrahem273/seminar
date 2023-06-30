@@ -1,0 +1,2 @@
+
+<p>{{ $ara['resetPasswordToken'] }} </p>

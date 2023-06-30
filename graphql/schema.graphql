@@ -1,0 +1,81 @@
+"A datetime string with format `Y-m-d H:i:s`, e.g. `2018-05-23 13:43:32`."
+scalar DateTime @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
+scalar  BigInt @scalar(class: "App\\GraphQL\\Scalars\\BigInt")
+
+"Indicates what fields are available at the top level of a query operation."
+type Query {
+#    people(
+#        where: _ @whereConditions(columns: ["age", "type", "haircolour", "height"])
+#    ): [Person!]! @all
+#    me: User @auth(guard: "sanctum")
+
+    all_user: [User!]! @all
+
+    "Find a single user by an identifying attribute."
+    find_user(
+        id: ID @eq
+        #      @rules(apply: ["prohibits:email", "required_without:email"])
+        #      "Search by email address."
+        email: String @eq @rules(apply: ["prohibits:id", "required_without:id", "email"])
+    ): [User] @find
+
+    paginate_users(
+        name: String @where(operator: "like")
+    ): [User!]! @paginate(defaultCount: 10)
+
+#    chats: [Chat] @all
+
+}
+#type  Subscription{
+#
+#    createdUser(user_id:ID):User
+#}
+"Account of a person who utilizes this application."
+type User {
+    id: ID!
+    name: String!
+    password:String !
+    age:BigInt
+    email:String,
+    category:Int,
+
+#        subjects:[subject!]!@belongsToMany
+
+}
+type Mutation{
+
+    create_user(user:CreateUserInput @spread ):User @create
+    update_user(id:ID,name:String):User! @update
+    delete_user(id:ID):User! @update
+    upsert_user(id:ID,name:String,email:String):User! @upsert
+
+    login(
+        email: String!
+        password: String!
+    ): String @field(resolver: "AuthMutator@resolve")
+
+}
+
+input  CreateUserInput
+{
+    name: String
+    email: String
+    password: String @hash
+    category:Int,
+    age:BigInt,
+    subjects: CreateSubjectBelongToMany
+
+}
+
+
+input CreateSubjectBelongToMany
+{
+    connect:[ID!]
+    sync:[ID!]
+}
+
+
+#import chat/chat.graphql
+#import subject/subject.graphql
+#import subject_time_schedule/subject_time_schedule.graphql
+

@@ -1,0 +1,64 @@
+type subject
+{    dr:Int,
+    id:ID,
+    category:Int,
+    department:String,
+    year:Int,
+    duration:Float,
+    name:String,
+    specialty:String,
+    passed:Int,
+    created_at:DateTime,
+    updated_at:DateTime
+    subject_time_schedule: [SubjectTimeSchedule!]! @hasMany
+
+
+}
+enum check_subject {
+    CATEGORY @enum(value: "category"),
+}
+extend type Mutation
+{
+    create_subject(subject:SubjectInput @spread):subject @create
+
+
+
+}
+
+input SubjectInput
+{dr:Int,
+    year:Int,
+    duration:Float,
+    category:Int,
+    department:String,
+    name:String,
+    specialty:String,
+    subject_time_schedule: hasManySubjectTimeScheduleInput
+    doctor:belongToManyDoctor
+
+}
+
+input belongToManyDoctor
+{
+    connect:[Int]
+}
+input hasManySubjectTimeScheduleInput
+{
+    create:[CreateSubjectTimeScheduleInput]
+
+}
+
+input CreateSubjectTimeScheduleInput{
+    day:String,
+    begin:String,
+    end:String
+}
+
+extend  type Query{
+
+    check_time_exist(
+        subject_time_schedule:_ @whereHasConditions(columns:["begin","end","day"] )
+        where: _ @whereConditions(columnsEnum: "check_subject")
+    ): [subject!]! @all
+
+}

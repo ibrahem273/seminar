@@ -1,0 +1,10 @@
+type SubjectTimeSchedule
+{
+    id:ID,
+    subject_id:Int,
+    day:String,
+    begin:String,
+    end:String
+
+}
+

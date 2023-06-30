@@ -1,0 +1,20 @@
+type  Chat{
+
+    id :ID,
+    created_by :Int,
+    name:String,
+    is_private:Int,
+    created_at:DateTime,
+    update_at:DateTime
+
+}
+
+extend  type  Query{
+    all_chats: [Chat]@all
+
+}
+extend  type  Mutation {
+
+    create_chat(name:String, user_id:Int,): Chat @create
+
+}

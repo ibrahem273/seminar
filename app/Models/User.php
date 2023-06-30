@@ -6,6 +6,7 @@ namespace App\Models;
 use App\Notifications\MessageSent;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -23,9 +24,13 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var array<int, string>
      */
     protected $fillable = [
+        'year',
+        'age',
         'name',
         'email',
+        'category',
         'password',
+        'isDoctor','photo_path'
     ];
 
     /**
@@ -34,7 +39,12 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var array<int, string>
      */
     protected $hidden = [
-       ];
+        'pivot',
+        'password',
+        'email_verified_at',
+        'remember_token', 'updated_at', 'created_at', 'oauth_id', 'oauth_type'
+
+    ];
 
     /**
      * The attributes that should be cast.
@@ -45,21 +55,49 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
     ];
 
+    public  function  photoable()
+    {
+        return $this->morphMany('App\photo','imageable')
+;
+
+
+
+    }
     public function chats(): HasMany
     {
         return $this->hasMany(Chat::class, 'created_by');
     }
-  public function sendNewMessageNotification(array  $data):void
-  {
-   $this->notify(new MessageSent($data));
-  }
+
+    public function sendNewMessageNotification(array $data): void
+    {
+        $this->notify(new MessageSent($data));
+    }
+
     public function routeNotificationForOneSignal()
     {
         return ['tags' => ['key' => 'userId', 'relation' => '=', 'value' => '5']];
     }
-    public function subjects():BelongsToMany
+
+    public function subjects(): BelongsToMany
     {
-        return $this->belongsToMany(subject::class)->withTimestamps();
+        return $this->belongsToMany(subject::class,)->withTimestamps()->withPivot(['passed']);
 
     }
+
+
+    public function doctors(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'student_dr', 'student_id', 'dr_id');
+
+    }
+
+    public function students(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'student_dr', 'dr_id', 'student_id');
+    }
+//    public function Category():BelongsTo
+//    {
+//        return $this->belongsTo(category::Class);
+//
+//    }
 }
