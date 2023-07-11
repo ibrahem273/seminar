@@ -1,10 +1,10 @@
 <?php
 
 use App\Http\Controllers\auth\GoogleController;
+use App\Http\Controllers\livestream\livestreamController;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Http\Controllers\PasswordResetLinkController;
 
@@ -92,8 +92,27 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('subject', \App\Http\Controllers\subjectController::class)->only('store', 'index');
 
 
-    Route::get('attach_subject', [\App\Http\Controllers\subjectController::class, 'attach_subject']);
+//    Route::get('attach_subject', [\App\Http\Controllers\subjectController::class, 'attach_subject']);
 
+     Route::post('/presence',[\App\Http\Controllers\UserController::class,'takePresence']);
 
+    Route::resource('/livestream',livestreamController::class)->only('store')->middleware(['DoctorMiddleware']);
+    Route::get('/get_users_category',[\App\Http\Controllers\UserController::class,'getUsersCategory'])->middleware(['DoctorMiddleware']);
+    Route::resource('/livestream',livestreamController::class)->only('index');
+   Route::get('all_livestream',function (){
+    return \App\Models\livestream::all();
 });
+});
+//Route::post('/livestream',[livestreamController::class,'store'])
+//    ->middleware('auth:sanctum');
+
+//Route::group(['middleware' => ['auth:sanctum', 'DoctorMiddleware']], function() {
+//    Route::post('/livestream',[livestreamController::class,'store'])->middleware('DoctorMiddleware');
+//
+//    // uses 'auth' middleware plus all middleware from $middlewareGroups['web']
+////    Route::resource('blog','BlogController'); //Make a CRUD controller
+//});
+
+//Route::resource('/livestream',\App\Http\Controllers\livestream\livestreamController::class)->only('store','index');
+//Route::resource('/livestream_viewer', \App\Http\Controllers\livestream\livestreamViewerControllerc::class)->only('index');
 

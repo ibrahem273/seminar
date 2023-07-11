@@ -13,7 +13,7 @@ class subject extends Model
 
     protected $table = 'subjects';
     protected $guarded = [];
-protected $hidden=['pivot','created_at','updated_at'];
+protected $hidden=['created_at','updated_at'];
     public function subject_time_schedule(): HasMany
     {
         return $this->hasMany(SubjectTimeSchedule::class);

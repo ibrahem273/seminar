@@ -30,7 +30,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'category',
         'password',
-        'isDoctor','photo_path'
+        'isDoctor','photo_path','isAdmin'
     ];
 
     /**
@@ -73,9 +73,9 @@ class User extends Authenticatable implements MustVerifyEmail
         $this->notify(new MessageSent($data));
     }
 
-    public function routeNotificationForOneSignal()
+    public function routeNotificationForOneSignal(): array
     {
-        return ['tags' => ['key' => 'userId', 'relation' => '=', 'value' => '5']];
+        return ['tags' => ['key' => 'userId', 'relation' => '=', 'value' => (string)$this->id]];    
     }
 
     public function subjects(): BelongsToMany

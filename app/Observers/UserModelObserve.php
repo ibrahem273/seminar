@@ -28,7 +28,6 @@ class UserModelObserve
             }
 
         }
-
         if ($user->photo_path) {
             photo::create(
                 [
