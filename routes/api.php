@@ -85,6 +85,8 @@ Route::middleware('auth:sanctum')->get('user/revoke', function (Request $request
 });
 //
 Route::middleware('auth:sanctum')->group(function () {
+
+//    Route::get('/get_students_category',);
     Route::apiResource('chat', \App\Http\Controllers\chatController::class)->only(['store', 'index', 'show']);
 //   Route::get('/message',[\App\Http\Controllers\chatMessageController::class,'index']);
     Route::apiResource('message', \App\Http\Controllers\chatMessageController::class)->only(['store', 'index']);

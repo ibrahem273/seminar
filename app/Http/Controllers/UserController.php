@@ -16,7 +16,6 @@ class UserController extends Controller
     {
         return $this->success(User::where('category',$request->category)->get());
 
-
     }
     public function index()
     {
