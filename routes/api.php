@@ -19,17 +19,13 @@ use Laravel\Fortify\Http\Controllers\PasswordResetLinkController;
 |
 */
 \Illuminate\Support\Facades\Broadcast::routes(['middleware' => ['auth:sanctum']]);
+Route::post('find_subject_lectures',[\App\Http\Controllers\lectureController::class,'find']);
+Route::post('find_subject_courses',[\App\Http\Controllers\courseController::class,'find']);
+Route::resource('/courses',\App\Http\Controllers\courseController::class)->only('store');
 Route::get('/test', [GoogleController::class, 'ss']);
 Route::post('/forgot-password', [\App\Http\Controllers\SanctumController::class, 'forgotPassword']);
 Route::post('/reset-Password', [\App\Http\Controllers\SanctumController::class, 'resetPassword']);
-Route::post('/register', function (Request $request) {
-
-    User::create(['email' => $request['email'], 'password' => Hash::make($request['password'])
-        , 'isDoctor' => $request['isDoctor'],'photo_path'=>$request['photo_path']
-        , 'name' => $request['name'], 'age' => $request['age'], 'category' => $request['category'], 'year' => $request['year']
-    ]);
-
-});
+Route::post('/register', [\App\Http\Controllers\UserController::class,'register']);
 Route::post('/sanctum/token', function (Request $request) {
 //    $request->validate([
 //        'email' => 'required|email',
@@ -70,7 +66,7 @@ Route::middleware('auth:sanctum')->get('/allUser', function (Request $request) {
 
 });
 Route::resource('image', \App\Http\Controllers\ImageController::class);
-
+Route::post('/send_notify',[\App\Http\Controllers\NotificationController::class,'store']);
 Route::middleware('auth:sanctum')->get('user/revoke', function (Request $request) {
     $user = $request->user();
     $user->tokens()->delete();
@@ -84,6 +80,10 @@ Route::middleware('auth:sanctum')->get('user/revoke', function (Request $request
 
 });
 //
+
+Route::prefix('/doctor')->group(function (){
+    Route::resource('lecture',\App\Http\Controllers\lectureController::class)->only('store');
+});
 Route::middleware('auth:sanctum')->group(function () {
 
 //    Route::get('/get_students_category',);
@@ -96,14 +96,19 @@ Route::middleware('auth:sanctum')->group(function () {
 
 //    Route::get('attach_subject', [\App\Http\Controllers\subjectController::class, 'attach_subject']);
 
-     Route::post('/presence',[\App\Http\Controllers\UserController::class,'takePresence']);
+    Route::post('/presence',[\App\Http\Controllers\UserController::class,'takePresence']);
 
     Route::resource('/livestream',livestreamController::class)->only('store')->middleware(['DoctorMiddleware']);
-    Route::get('/get_users_category',[\App\Http\Controllers\UserController::class,'getUsersCategory'])->middleware(['DoctorMiddleware']);
+    Route::post('/get_users_category',[\App\Http\Controllers\UserController::class,'getUsersCategory'])->middleware(['DoctorMiddleware']);
     Route::resource('/livestream',livestreamController::class)->only('index');
-   Route::get('all_livestream',function (){
-    return \App\Models\livestream::all();
+    Route::get('all_livestream',function (){
+        return \App\Models\livestream::all();
+    });
 });
+Route::post('findUser',[\App\Http\Controllers\UserController::class,'findUser']);
+
+Route::prefix('/livesStream')->group(function (){
+    Route::post('/store_livestream_field',[\App\Http\Controllers\UserController::class,'storeLivestreamField']);
 });
 //Route::post('/livestream',[livestreamController::class,'store'])
 //    ->middleware('auth:sanctum');

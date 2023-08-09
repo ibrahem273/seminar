@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\lecture;
 use App\Models\User;
+use App\Observers\lectureModelObserver;
 use App\Observers\UserModelObserve;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
@@ -22,7 +24,7 @@ class EventServiceProvider extends ServiceProvider
         ],
     ];
     protected $observers = [
-        User::class => [UserModelObserve::class]
+        User::class => [UserModelObserve::class],
     ];
 
     /**

@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\image;
+use App\Http\Requests\storeCourseRequest;
+use App\Models\course;
 use Illuminate\Http\Request;
 
-class ImageController extends Controller
+class courseController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -31,30 +32,23 @@ class ImageController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return String
+     * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
-    {$path='';
-           $image = new Image;
+    public function store(storeCourseRequest $request)
+    {
+        $data=$request->validated();
+        course::create($data);
+        return  $this->success('');
 
-                $image->title = $request->title;
-
-                    if ($request->hasFile('image')) {
-                    $path = '/storage/'.$request->file('image')->store($request->title);
-                    $image->url = $path;
-                    $image->save();
-                    return  $this->success($path);
-                   }
-                return $this->success('','',422);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\image  $image
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(image $image)
+    public function show($id)
     {
         //
     }
@@ -62,10 +56,10 @@ class ImageController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\image  $image
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(image $image)
+    public function edit($id)
     {
         //
     }
@@ -74,10 +68,10 @@ class ImageController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\image  $image
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, image $image)
+    public function update(Request $request, $id)
     {
         //
     }
@@ -85,11 +79,17 @@ class ImageController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\image  $image
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(image $image)
+    public function destroy($id)
     {
         //
+    }
+
+
+    public function find(\Symfony\Component\HttpFoundation\Request $request)
+    {
+return        $this->success( course::where('subject_id',$request->subject_id)->get());
     }
 }

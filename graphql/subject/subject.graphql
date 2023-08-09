@@ -14,6 +14,26 @@ type subject
 
 
 }
+enum SubjectColumn {
+    #    dr:Int,
+    #    id:ID,
+    #    category:Int,
+    #    department:String,
+    #    year:Int,
+    #    duration:Float,
+    #    name:String,
+    #    specialty:String,
+    #    passed:Int,
+    #    created_at:DateTime,
+    #    updated_at:DateTime
+    #    subject_time_schedule: [SubjectTimeSchedule!]! @hasMany
+    CATEGORY @enum(value: "category")
+    DR @enum(value: "dr")
+    YEAR @enum(value: "year")
+    TYPE @enum(value: "type")
+    #    HAIRCOLOUR @enum(value: "haircolour")
+    #    HEIGHT @enum(value: "height")
+}
 enum check_subject {
     CATEGORY @enum(value: "category"),
 }
@@ -55,9 +75,16 @@ input CreateSubjectTimeScheduleInput{
 }
 
 extend  type Query{
+    check_validation(
+        where: _ @whereConditions(columns: ["category","dr"])
+        subject_time_schedule: _ @whereHasConditions(columns:["subject_id","day","begin","end"])
 
+    ): Boolean  !  @find(model: "subject")
     check_time_exist(
-        subject_time_schedule:_ @whereHasConditions(columns:["begin","end","day"] )
+        subject_time_schedule:_ @whereHasConditions(
+
+
+            columns:["begin","end","day"] )
         where: _ @whereConditions(columnsEnum: "check_subject")
     ): [subject!]! @all
 

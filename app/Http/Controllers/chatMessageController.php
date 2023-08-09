@@ -37,7 +37,7 @@ class chatMessageController extends Controller
         );
         $chatMessage->load('user');
 
-        $this->sendNotificationToOther($chatMessage);
+        return $this->sendNotificationToOther($chatMessage);
 
 
         return $this->success($chatMessage, 'Message has been sent successfully');
@@ -49,24 +49,34 @@ class chatMessageController extends Controller
     {
         broadcast(new NewMessageSent($chatMessage))->toOthers();
         $user = auth()->user();
-        $user_id = auth()->user()->id;
+        $user_id = $user->id;
         $chat = Chat::where('id', $chatMessage->chat_id)->with(['participants'
         => function ($query) use ($user_id) {
                 $query->where('user_id', '!=', $user_id);
             }
         ])->first();
         if (count($chat->participants) > 0) {
-
+            info('asdds');
             $otherUserId = $chat->participants[0]->user_id;
 
             $otherUser = User::where('id', $otherUserId)->first();
 
+            $user = auth()->user();
+//return $user;
+            if ($user->isAdmin == 1) {
+
+                $otherUser->update([
+                    'isAdmin' => 1
+                ]);
+                $otherUser->save();
+
+
+            }
             $otherUser->sendNewMessageNotification([
                 'messageData' => [
                     'senderName' => $user->name,
                     'message' => $chatMessage->message,
                     'chatId' => $chatMessage->chat_id
-
                 ]
 
             ]);
@@ -74,7 +84,6 @@ class chatMessageController extends Controller
 
 
     }
-
 
 
 }

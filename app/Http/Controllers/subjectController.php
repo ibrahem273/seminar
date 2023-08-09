@@ -53,7 +53,7 @@ class subjectController extends Controller
 
     public function index(Request $request)
     {
-        ;
+
         $user = User::find(auth()->user()->id);
         return $this->success(data: $user->load('subjects', 'subjects.subject_time_schedule', 'doctors'));
 

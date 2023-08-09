@@ -38,7 +38,7 @@ class MessageSent extends Notification
     public function toOneSignal()
     {
         $messageData = $this->data['messageData'];
-        return OneSignalMessage::create()->setSubject($messageData['senderName'] . "sent you a message.")
+        return OneSignalMessage::create()->setSubject($messageData['senderName'] . " sent you a message.")
             ->setBody($messageData['message'])
             ->setData('data', $messageData);
     }

@@ -2,21 +2,56 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\find_user_request;
+use App\Http\Requests\livestream\storeLiveStreamRequset;
 use App\Http\Requests\PresenceRequest;
+use App\Http\Requests\registerStoreRequest;
+use App\Http\Requests\store_livestream_field;
 use App\Http\Requests\usersCategoryRequest;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    function register(registerStoreRequest $request)
+    {
 
+        $user = User::create(['email' => $request['email'], 'password' => Hash::make($request['password'])
+            , 'isDoctor' => $request['isDoctor'], 'photo_path' => $request['photo_path']
+            , 'name' => $request['name'], 'age' => $request['age'], 'category' => $request['category'], 'year' => $request['year']
+        ]);
+        return $this->success('');
+
+    }
+
+    public function storeLivestreamField(store_livestream_field $request)
+    {
+        $user = User::where('id', $request->user_id)->first();
+        $user->update(['livestream_id' => $request->livestream_id]);
+        $user->save();
+        return $user;
+    }
+
+    public function findUser(find_user_request $request)
+    {
+        $user = User::where('id', $request->id)->get()->load('subjects');
+        return $user;
+
+    }
 
     public function getUsersCategory(usersCategoryRequest $request): JsonResponse
     {
-        return $this->success(User::where('category',$request->category)->get());
+        return $this->success(User::where([
+            ['category', $request->category],
+            ['year', $request->year],
+//
+
+        ])->get());
 
     }
+
     public function index()
     {
 
@@ -37,7 +72,7 @@ class UserController extends Controller
 
         }
 
-        return $subject;
+        return $this->success();
 
 
     }

@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\image;
+use App\Events\NewNotificationSent;
+use App\Http\Requests\sendNotifyRequest;
+use App\Models\notification;
 use Illuminate\Http\Request;
 
-class ImageController extends Controller
+class NotificationController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -31,30 +33,22 @@ class ImageController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return String
+     * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
-    {$path='';
-           $image = new Image;
+    public function store(sendNotifyRequest $request)
+    { $data=$request->validated();
+        $notification=notification::create($data);
+        broadcast(new NewNotificationSent($notification))->toOthers();
 
-                $image->title = $request->title;
-
-                    if ($request->hasFile('image')) {
-                    $path = '/storage/'.$request->file('image')->store($request->title);
-                    $image->url = $path;
-                    $image->save();
-                    return  $this->success($path);
-                   }
-                return $this->success('','',422);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\image  $image
+     * @param  \App\Models\notification  $notification
      * @return \Illuminate\Http\Response
      */
-    public function show(image $image)
+    public function show(notification $notification)
     {
         //
     }
@@ -62,10 +56,10 @@ class ImageController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\image  $image
+     * @param  \App\Models\notification  $notification
      * @return \Illuminate\Http\Response
      */
-    public function edit(image $image)
+    public function edit(notification $notification)
     {
         //
     }
@@ -74,10 +68,10 @@ class ImageController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\image  $image
+     * @param  \App\Models\notification  $notification
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, image $image)
+    public function update(Request $request, notification $notification)
     {
         //
     }
@@ -85,10 +79,10 @@ class ImageController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\image  $image
+     * @param  \App\Models\notification  $notification
      * @return \Illuminate\Http\Response
      */
-    public function destroy(image $image)
+    public function destroy(notification $notification)
     {
         //
     }

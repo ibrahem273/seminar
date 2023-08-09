@@ -23,14 +23,18 @@ class User extends Authenticatable implements MustVerifyEmail
      *
      * @var array<int, string>
      */
+
     protected $fillable = [
+        'livestream_id',
         'year',
         'age',
         'name',
         'email',
         'category',
         'password',
-        'isDoctor','photo_path','isAdmin'
+        'isDoctor',
+        'photo_path',
+        'isAdmin'
     ];
 
     /**
@@ -42,7 +46,11 @@ class User extends Authenticatable implements MustVerifyEmail
         'pivot',
         'password',
         'email_verified_at',
-        'remember_token', 'updated_at', 'created_at', 'oauth_id', 'oauth_type'
+        'remember_token',
+        'updated_at',
+        'created_at',
+        'oauth_id',
+        'oauth_type'
 
     ];
 
@@ -75,12 +83,25 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function routeNotificationForOneSignal(): array
     {
-        return ['tags' => ['key' => 'userId', 'relation' => '=', 'value' => (string)$this->id]];    
+        $tag=(string)$this->id;
+
+        if($this->isAdmin==1)
+        {
+            $tag=(string)($this->id);
+
+            $this->update([
+                'isAdmin' => 0
+            ]);
+            $this->save();
+
+
+        }
+        return ['tags' => ['key' => 'notification', 'relation' => '=', 'value' => $tag]];
     }
 
     public function subjects(): BelongsToMany
     {
-        return $this->belongsToMany(subject::class,)->withTimestamps()->withPivot(['passed']);
+        return $this->belongsToMany(subject::class,)->withTimestamps()->withPivot(['passed','presence']);
 
     }
 
