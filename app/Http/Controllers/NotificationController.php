@@ -16,7 +16,7 @@ class NotificationController extends Controller
      */
     public function index()
     {
-        //
+
     }
 
     /**
@@ -36,10 +36,14 @@ class NotificationController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(sendNotifyRequest $request)
-    { $data=$request->validated();
-        $notification=notification::create($data);
-        broadcast(new NewNotificationSent($notification))->toOthers();
-
+    { $data=$request->validated()
+    ;
+        notification::create(
+            ['message'=> 's',
+                'user_id'=>1,
+            ]
+        );
+//
     }
 
     /**
@@ -85,5 +89,11 @@ class NotificationController extends Controller
     public function destroy(notification $notification)
     {
         //
+    }
+    public  function find(\Symfony\Component\HttpFoundation\Request $request)
+    {
+        $notifications=notification::where('user_id',$request->user_id)->get();
+
+    return $notifications;
     }
 }

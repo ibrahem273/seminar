@@ -27,12 +27,6 @@ Route::post('/forgot-password', [\App\Http\Controllers\SanctumController::class,
 Route::post('/reset-Password', [\App\Http\Controllers\SanctumController::class, 'resetPassword']);
 Route::post('/register', [\App\Http\Controllers\UserController::class,'register']);
 Route::post('/sanctum/token', function (Request $request) {
-//    $request->validate([
-//        'email' => 'required|email',
-//        'password' => 'required',
-//            'device_name' => 'required',
-//    ]);
-//    return 1324;
     $user = User::where('email', $request->email)->first();
 
     if (!$user || !Hash::check($request->password, $user->password)) {
@@ -50,7 +44,7 @@ Route::post('/sanctum/token', function (Request $request) {
     ], 200);
 }
 );
-
+Route::post('find_user_notifications',[\App\Http\Controllers\NotificationController::class,'find']);
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });

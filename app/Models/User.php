@@ -94,10 +94,12 @@ class User extends Authenticatable implements MustVerifyEmail
             ]);
             $this->save();
 
+            return ['tags' => ['key' => 'notification', 'relation' => '=', 'value' => $tag]];
 
         }
-        return ['tags' => ['key' => 'notification', 'relation' => '=', 'value' => $tag]];
-    }
+        else {
+            return ['tags' => ['key' => 'userId', 'relation' => '=', 'value' => $tag]];
+        }}
 
     public function subjects(): BelongsToMany
     {

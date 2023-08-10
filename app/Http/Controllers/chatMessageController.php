@@ -7,6 +7,7 @@ use App\Http\Requests\GetMessageRequest;
 use App\Http\Requests\StoreMessageRequest;
 use App\Models\Chat;
 use App\Models\ChatMessage;
+use App\Models\notification;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -17,6 +18,7 @@ class chatMessageController extends Controller
     public function index(GetMessageRequest $request)
     {
         $data = $request->validated();
+
         $chatId = $data['chat_id'];
         $currentPage = $data['page'];
         $pageSize = $data['pageSize'] ?? 15;
@@ -29,6 +31,7 @@ class chatMessageController extends Controller
     public function store(storeMessageRequest $request)
     {
         $data = $request->validated();
+
         $data['user_id'] = auth()->user()->id;
 
 
@@ -56,30 +59,45 @@ class chatMessageController extends Controller
             }
         ])->first();
         if (count($chat->participants) > 0) {
-            info('asdds');
+
             $otherUserId = $chat->participants[0]->user_id;
 
             $otherUser = User::where('id', $otherUserId)->first();
 
             $user = auth()->user();
-//return $user;
             if ($user->isAdmin == 1) {
+
 
                 $otherUser->update([
                     'isAdmin' => 1
                 ]);
+
+                notification::create(
+                    [
+                        'senderName'=>auth()->user()->name,
+                        'message'=> $chatMessage->message,
+                        'user_id'=>$otherUserId,
+                    ]);
+
                 $otherUser->save();
+                $otherUser->sendNewMessageNotification([
+                    'messageData' => [
+                        'senderName' => $user->name,
+                        'message' => $chatMessage->message,]]
+
+                    );
 
 
+            } else {
+                $otherUser->sendNewMessageNotification([
+                    'messageData' => [
+                        'senderName' => $user->name,
+                        'message' => $chatMessage->message,
+                        'chatId' => $chatMessage->chat_id
+                    ]
+
+                ]);
             }
-            $otherUser->sendNewMessageNotification([
-                'messageData' => [
-                    'senderName' => $user->name,
-                    'message' => $chatMessage->message,
-                    'chatId' => $chatMessage->chat_id
-                ]
-
-            ]);
         }
 
 
