@@ -30,15 +30,17 @@ class chatMessageController extends Controller
 
     public function store(storeMessageRequest $request)
     {
+
         $data = $request->validated();
 
         $data['user_id'] = auth()->user()->id;
 
 
         $chatMessage = ChatMessage::create($data);
-        $chatMessage->chat_id = intval($chatMessage->chat_id
-        );
+        $chatMessage->chat_id = intval($chatMessage->chat_id);
         $chatMessage->load('user');
+        $request->broadcast=$chatMessage->broadcast;
+
 
         return $this->sendNotificationToOther($chatMessage);
 
@@ -65,6 +67,34 @@ class chatMessageController extends Controller
             $otherUser = User::where('id', $otherUserId)->first();
 
             $user = auth()->user();
+
+            if($chatMessage->broadcast!= null)
+            {
+
+
+                $otherUser->update([
+                    'isAdmin' => 10
+
+                ]);
+
+                notification::create(
+                    [
+                        'senderName'=>auth()->user()->name,
+
+                        'message'=> $chatMessage->message,
+                        'user_id'=>$otherUserId,
+                    ]);
+
+                $otherUser->save();
+                $otherUser->sendNewMessageNotification([
+                        'messageData' => [
+                            'senderName' => $user->name,
+                            'message' => $chatMessage->message,]]
+
+                );
+
+
+            }
             if ($user->isAdmin == 1) {
 
 
@@ -75,6 +105,7 @@ class chatMessageController extends Controller
                 notification::create(
                     [
                         'senderName'=>auth()->user()->name,
+
                         'message'=> $chatMessage->message,
                         'user_id'=>$otherUserId,
                     ]);
@@ -88,7 +119,8 @@ class chatMessageController extends Controller
                     );
 
 
-            } else {
+            }
+            else {
                 $otherUser->sendNewMessageNotification([
                     'messageData' => [
                         'senderName' => $user->name,

@@ -4,7 +4,13 @@ scalar  BigInt @scalar(class: "App\\GraphQL\\Scalars\\BigInt")
 
 "Indicates what fields are available at the top level of a query operation."
 type Query {
-#    people(
+    check_user_validation(
+#        where: _ @whereConditions(columns: ["category"])
+        subject_time_schedule: _ @whereHasConditions(columns:["user_id","day","begin","end"])
+
+    ):Boolean  @find(model: "user")
+
+    #    people(
 #        where: _ @whereConditions(columns: ["age", "type", "haircolour", "height"])
 #    ): [Person!]! @all
 #    me: User @auth(guard: "sanctum")

@@ -26,14 +26,18 @@ Route::get('/test', [GoogleController::class, 'ss']);
 Route::post('/forgot-password', [\App\Http\Controllers\SanctumController::class, 'forgotPassword']);
 Route::post('/reset-Password', [\App\Http\Controllers\SanctumController::class, 'resetPassword']);
 Route::post('/register', [\App\Http\Controllers\UserController::class,'register']);
+Route::post('/update_profile_picture', [\App\Http\Controllers\UserController::class,'update_profile_picture']);
 Route::post('/sanctum/token', function (Request $request) {
     $user = User::where('email', $request->email)->first();
 
     if (!$user || !Hash::check($request->password, $user->password)) {
-        return '404';
-    }
 
-//     $user->createToken($request->device_name)->plainTextToken;
+        return response()->json([
+            'data' => [''],
+            'success' => false,
+            'message' => 'invalid information'
+        ], 200);    }
+
 
     return response()->json([
         'data' => ['user' => $user,
@@ -42,8 +46,7 @@ Route::post('/sanctum/token', function (Request $request) {
         'success' => true,
         'message' => 'ok'
     ], 200);
-}
-);
+});
 Route::post('find_user_notifications',[\App\Http\Controllers\NotificationController::class,'find']);
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

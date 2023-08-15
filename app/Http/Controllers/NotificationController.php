@@ -92,8 +92,9 @@ class NotificationController extends Controller
     }
     public  function find(\Symfony\Component\HttpFoundation\Request $request)
     {
+//        return $request->user_id;
         $notifications=notification::where('user_id',$request->user_id)->get();
 
-    return $notifications;
+    return $this->success($notifications);
     }
 }

@@ -1,6 +1,8 @@
 type subject
-{    dr:Int,
+{
     id:ID,
+
+DR:Int,
     category:Int,
     department:String,
     year:Int,
@@ -46,7 +48,7 @@ extend type Mutation
 }
 
 input SubjectInput
-{dr:Int,
+{dr:BigInt,
     year:Int,
     duration:Float,
     category:Int,
@@ -76,10 +78,10 @@ input CreateSubjectTimeScheduleInput{
 
 extend  type Query{
     check_validation(
-        where: _ @whereConditions(columns: ["category","dr"])
+        where: _ @whereConditions(columns: ["category"])
         subject_time_schedule: _ @whereHasConditions(columns:["subject_id","day","begin","end"])
 
-    ): Boolean  !  @find(model: "subject")
+    ):Boolean  @find(model: "subject")
     check_time_exist(
         subject_time_schedule:_ @whereHasConditions(
 

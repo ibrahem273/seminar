@@ -12,7 +12,7 @@ class ChatMessage extends Model
 
 protected $table='chat_messages';
 protected $guarded=['id'];
-protected $touches=['chat'];
+//protected $touches=['chat'];
 
 public function user():BelongsTo
 {

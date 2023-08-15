@@ -63,14 +63,13 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
     ];
 
-    public  function  photoable()
+    public function photoable()
     {
-        return $this->morphMany('App\photo','imageable')
-;
-
+        return $this->morphMany('App\photo', 'imageable');
 
 
     }
+
     public function chats(): HasMany
     {
         return $this->hasMany(Chat::class, 'created_by');
@@ -83,11 +82,20 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function routeNotificationForOneSignal(): array
     {
-        $tag=(string)$this->id;
+        $tag = (string)$this->id;
 
-        if($this->isAdmin==1)
-        {
-            $tag=(string)($this->id);
+        if ($this->isAdmin == 10) {
+//            $tag=(string)($this->id);
+
+            $this->update([
+                'isAdmin' => 0
+            ]);
+            $this->save();
+
+            return ['tags' => ['key' => 'broadcast', 'relation' => '=', 'value' => 1]];
+
+        } else if ($this->isAdmin == 1) {
+            $tag = (string)($this->id);
 
             $this->update([
                 'isAdmin' => 0
@@ -96,14 +104,14 @@ class User extends Authenticatable implements MustVerifyEmail
 
             return ['tags' => ['key' => 'notification', 'relation' => '=', 'value' => $tag]];
 
-        }
-        else {
+        } else {
             return ['tags' => ['key' => 'userId', 'relation' => '=', 'value' => $tag]];
-        }}
+        }
+    }
 
     public function subjects(): BelongsToMany
     {
-        return $this->belongsToMany(subject::class,)->withTimestamps()->withPivot(['passed','presence']);
+        return $this->belongsToMany(subject::class,)->withTimestamps()->withPivot(['passed', 'presence', 'absence']);
 
     }
 
@@ -118,9 +126,11 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->belongsToMany(User::class, 'student_dr', 'dr_id', 'student_id');
     }
-//    public function Category():BelongsTo
-//    {
-//        return $this->belongsTo(category::Class);
-//
-//    }
+
+    public function subject_time_schedule(): HasMany
+    {
+        return $this->hasMany(SubjectTimeSchedule::class);
+    }
+
+
 }

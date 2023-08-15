@@ -25,8 +25,9 @@ class PresenceRequest extends FormRequest
     {
         return [
             'subject_id' => 'required|exists:subjects,id',
-//            'user_ids' => 'required|exists:users,id',
-            'user_ids_array' => 'array'
+            'user_id' => 'required|array|exists:users,id',
+            'user_id_absence' => 'required|array|exists:users,id',
+//            'user_ids_array' => 'array'
 
             //
         ];
@@ -35,9 +36,9 @@ class PresenceRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'user_ids' => 'the user is not exist',
-            'user_ids_array' => 'user_id must be array',
-            'subject_id' => 'the subject is not exist'
+            'user_id.exists' => 'the user is not exist',
+            'user_id_absence.required' => 'user_id_absence is required',
+        'subject_id.exists' => 'the subject is not exist'
 
         ];
     }
