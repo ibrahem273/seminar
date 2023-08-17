@@ -30,30 +30,33 @@ class chatMessageController extends Controller
 
     public function store(storeMessageRequest $request)
     {
-
         $data = $request->validated();
 
-        $data['user_id'] = auth()->user()->id;
 
+        $data['user_id'] = auth()->user()->id;
 
         $chatMessage = ChatMessage::create($data);
         $chatMessage->chat_id = intval($chatMessage->chat_id);
         $chatMessage->load('user');
-        $request->broadcast=$chatMessage->broadcast;
-
+        $chatMessage['broadcast']= $request['broadcast'] ;
 
         return $this->sendNotificationToOther($chatMessage);
 
 
-        return $this->success($chatMessage, 'Message has been sent successfully');
+//        return $this->success($chatMessage, 'Message has been sent successfully');
 
     }
 
 
     public function sendNotificationToOther($chatMessage)
     {
-        broadcast(new NewMessageSent($chatMessage))->toOthers();
+
+
         $user = auth()->user();
+        if ($user->isAdmin !=1) {
+            broadcast(new NewMessageSent($chatMessage))->toOthers();
+        }
+
         $user_id = $user->id;
         $chat = Chat::where('id', $chatMessage->chat_id)->with(['participants'
         => function ($query) use ($user_id) {
@@ -68,21 +71,19 @@ class chatMessageController extends Controller
 
             $user = auth()->user();
 
-            if($chatMessage->broadcast!= null)
-            {
+            if ( $chatMessage['broadcast'] != null) {
 
 
                 $otherUser->update([
                     'isAdmin' => 10
-
                 ]);
 
                 notification::create(
                     [
-                        'senderName'=>auth()->user()->name,
+                        'senderName' => auth()->user()->name,
 
-                        'message'=> $chatMessage->message,
-                        'user_id'=>$otherUserId,
+                        'message' => $chatMessage->message,
+                        'user_id' => $otherUserId,
                     ]);
 
                 $otherUser->save();
@@ -95,28 +96,26 @@ class chatMessageController extends Controller
 
 
             }
-            if ($user->isAdmin == 1) {
-
-
+            else if ($user->isAdmin == 1) {
                 $otherUser->update([
                     'isAdmin' => 1
                 ]);
 
                 notification::create(
                     [
-                        'senderName'=>auth()->user()->name,
+                        'senderName' => auth()->user()->name,
 
-                        'message'=> $chatMessage->message,
-                        'user_id'=>$otherUserId,
+                        'message' => $chatMessage->message,
+                        'user_id' => $otherUserId,
                     ]);
 
                 $otherUser->save();
                 $otherUser->sendNewMessageNotification([
-                    'messageData' => [
-                        'senderName' => $user->name,
-                        'message' => $chatMessage->message,]]
+                        'messageData' => [
+                            'senderName' => $user->name,
+                            'message' => $chatMessage->message,]]
 
-                    );
+                );
 
 
             }
